@@ -139,13 +139,6 @@ void CPointerConstraint::activate() {
     m_active = true;
 
     g_pInputManager->simulateMouseMovement();
-
-    // Ensure the monitor schedules a frame when constraint activates
-    // This is especially important with VRR where frame scheduling may be suppressed
-    const auto PWINDOW = m_hlSurface->getWindow();
-    if (PWINDOW && PWINDOW->m_monitor) {
-        g_pCompositor->scheduleFrameForMonitor(PWINDOW->m_monitor.lock(), Aquamarine::IOutput::AQ_SCHEDULE_CURSOR_MOVE);
-    }
 }
 
 bool CPointerConstraint::isActive() {
