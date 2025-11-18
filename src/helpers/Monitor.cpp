@@ -1028,9 +1028,10 @@ bool CMonitor::shouldSkipScheduleFrameOnMouseEvent() {
     static auto PNOBREAK = CConfigValue<Hyprlang::INT>("cursor:no_break_fs_vrr");
     static auto PMINRR   = CConfigValue<Hyprlang::INT>("cursor:min_refresh_rate");
 
-    // Don't skip frame scheduling when pointer is constrained (e.g., in games with pointer lock)
-    // Constrained pointers need continuous updates for smooth camera movement
-    if (g_pInputManager->isConstrained())
+    // Don't skip frame scheduling when pointer is LOCKED (invisible cursor for camera control)
+    // This ensures smooth camera movement in FPS games with VRR enabled
+    // However, CONFINED pointers (visible cursor in menus) should follow normal VRR behavior
+    if (g_pInputManager->isLocked())
         return false;
 
     // skip scheduling extra frames for fullsreen apps with vrr
