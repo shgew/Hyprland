@@ -1028,6 +1028,11 @@ bool CMonitor::shouldSkipScheduleFrameOnMouseEvent() {
     static auto PNOBREAK = CConfigValue<Hyprlang::INT>("cursor:no_break_fs_vrr");
     static auto PMINRR   = CConfigValue<Hyprlang::INT>("cursor:min_refresh_rate");
 
+    // Don't skip frame scheduling when pointer is constrained (e.g., in games with pointer lock)
+    // Constrained pointers need continuous updates for smooth camera movement
+    if (g_pInputManager->isConstrained())
+        return false;
+
     // skip scheduling extra frames for fullsreen apps with vrr
     const bool shouldSkip = inFullscreenMode() && (*PNOBREAK == 1 || (*PNOBREAK == 2 && m_activeWorkspace->getFullscreenWindow()->getContentType() == CONTENT_TYPE_GAME)) &&
         m_output->state->state().adaptiveSync;
