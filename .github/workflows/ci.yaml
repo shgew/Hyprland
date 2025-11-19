@@ -3,7 +3,7 @@ name: Build Hyprland
 on: [push, pull_request, workflow_dispatch]
 jobs:
   gcc:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) || github.event_name == 'workflow_dispatch'
     name: "Build Hyprland (Arch)"
     runs-on: ubuntu-latest
     container:
@@ -43,7 +43,7 @@ jobs:
 
   clang-format:
     permissions: read-all
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) || github.event_name == 'workflow_dispatch'
     name: "Code Style"
     runs-on: ubuntu-latest
     steps:
