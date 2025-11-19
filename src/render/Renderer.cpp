@@ -1621,6 +1621,14 @@ bool CHyprRenderer::commitPendingAndDoExplicitSync(PHLMONITOR pMonitor) {
         pMonitor->m_output->state->setCTM(pMonitor->m_ctm);
     }
 
+    // AQ modesets can implicitly drop adaptive sync, so keep the DRM state
+    // aligned with what ensureVRR() decided earlier.
+    const bool wantsAdaptiveSync = pMonitor->m_vrrActive && pMonitor->m_output->vrrCapable;
+    if (pMonitor->m_output->state->state().adaptiveSync != wantsAdaptiveSync) {
+        pMonitor->m_output->state->resetExplicitFences();
+        pMonitor->m_output->state->setAdaptiveSync(wantsAdaptiveSync);
+    }
+
     pMonitor->m_previousFSWindow = FS_WINDOW;
 
     bool ok = pMonitor->m_state.commit();
@@ -1639,6 +1647,9 @@ bool CHyprRenderer::commitPendingAndDoExplicitSync(PHLMONITOR pMonitor) {
             pMonitor->m_damage.damageEntire();
         }
     }
+
+    if (ok)
+        g_pConfigManager->ensureVRR(pMonitor);
 
     return ok;
 }

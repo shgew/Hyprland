@@ -1730,6 +1730,8 @@ void CConfigManager::ensureVRR(PHLMONITOR pMonitor) {
 
         const auto USEVRR = m->m_activeMonitorRule.vrr.has_value() ? m->m_activeMonitorRule.vrr.value() : **PVRR;
 
+        Debug::log(LOG, "[VRR] ensureVRR monitor={} rule={} current={}", m->m_output->name, USEVRR, m->m_vrrActive);
+
         if (USEVRR == 0) {
             if (m->m_vrrActive) {
                 m->m_output->state->resetExplicitFences();
@@ -1769,6 +1771,9 @@ void CConfigManager::ensureVRR(PHLMONITOR pMonitor) {
                 const auto contentType = PWORKSPACE->getFullscreenWindow()->getContentType();
                 wantVRR                = contentType == CONTENT_TYPE_GAME || contentType == CONTENT_TYPE_VIDEO;
             }
+
+            Debug::log(LOG, "[VRR] fullscreen wantVRR={} workspace={} mode={} fsWin={}", wantVRR, PWORKSPACE->m_name, PWORKSPACE->m_fullscreenMode,
+                       PWORKSPACE->m_hasFullscreenWindow ? PWORKSPACE->getFullscreenWindow()->m_szTitle : "<none>");
 
             if (wantVRR) {
                 /* fullscreen */
