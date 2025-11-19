@@ -30,8 +30,8 @@ jobs:
 
       - name: Checkout personal branch
         run: |
-          git fetch origin personal:personal
-          git checkout personal
+          git fetch origin personal
+          git checkout -B personal origin/personal
 
       - name: Merge on upstream main
         run: |
