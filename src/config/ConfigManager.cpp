@@ -1775,17 +1775,29 @@ void CConfigManager::ensureVRR(PHLMONITOR pMonitor) {
                 m->m_vrrActive = true;
 
                 if (!m->m_output->state->state().adaptiveSync) {
+                    m->m_output->state->resetExplicitFences();
                     m->m_output->state->setAdaptiveSync(true);
 
+                    bool appliedVRR = true;
                     if (!m->m_state.test()) {
                         Debug::log(LOG, "Pending output {} does not accept VRR.", m->m_output->name);
                         m->m_output->state->setAdaptiveSync(false);
+                        appliedVRR = false;
                     }
+
+                    if (appliedVRR && !m->m_state.commit())
+                        Debug::log(ERR, "Couldn't commit output {} in ensureVRR -> dynamic true", m->m_output->name);
                 }
             } else {
                 m->m_vrrActive = false;
 
-                m->m_output->state->setAdaptiveSync(false);
+                if (m->m_output->state->state().adaptiveSync) {
+                    m->m_output->state->resetExplicitFences();
+                    m->m_output->state->setAdaptiveSync(false);
+
+                    if (!m->m_state.commit())
+                        Debug::log(ERR, "Couldn't commit output {} in ensureVRR -> dynamic false", m->m_output->name);
+                }
             }
         }
     };
