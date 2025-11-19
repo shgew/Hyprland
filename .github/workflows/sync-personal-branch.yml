@@ -1,0 +1,52 @@
+name: Sync Personal Branch
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 */8 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/hyprwm/Hyprland.git
+          git fetch upstream main
+
+      - name: Checkout personal branch
+        run: |
+          git fetch origin personal:personal
+          git checkout personal
+
+      - name: Merge on upstream main
+        run: |
+          git merge upstream/main
+        continue-on-error: true
+        id: merge
+
+      - name: Check merge status
+        if: steps.merge.outcome == 'failure'
+        run: |
+          echo "::warning::Merge failed. Manual intervention required."
+          git merge --abort
+          exit 1
+
+      - name: Push changes
+        if: steps.merge.outcome == 'success'
+        run: |
+          git push origin personal
