@@ -1,4 +1,4 @@
-name: Sync Personal Branch
+name: Sync Fork
 
 on:
   schedule:
