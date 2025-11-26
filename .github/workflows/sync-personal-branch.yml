@@ -8,43 +8,9 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.SYNC_ACCESS_TOKEN }}
-
-      - name: Configure git
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
-      - name: Add upstream remote
-        run: |
-          git remote add upstream https://github.com/hyprwm/Hyprland.git
-          git fetch upstream main
-
-      - name: Checkout personal branch
-        run: |
-          git fetch origin personal
-          git checkout -B personal origin/personal
-
-      - name: Merge on upstream main
-        run: |
-          git merge upstream/main
-        continue-on-error: true
-        id: merge
-
-      - name: Check merge status
-        if: steps.merge.outcome == 'failure'
-        run: |
-          echo "::warning::Merge failed. Manual intervention required."
-          git merge --abort
-          exit 1
-
-      - name: Push changes
-        if: steps.merge.outcome == 'success'
-        run: |
-          git push https://${{ secrets.SYNC_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git personal
+      - run: gh repo sync $REPOSITORY -b $BRANCH_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          BRANCH_NAME: ${{ github.ref_name }}
