@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <any>
 #include <ranges>
+#include <algorithm>
 #include "../../config/ConfigValue.hpp"
 
 namespace Desktop::Types {
